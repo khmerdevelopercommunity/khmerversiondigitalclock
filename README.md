@@ -1,1 +1,1 @@
-# Your site is live at https://khmerdevelopercommunity.github.io/khmerversiondigitalclock/
+# Your site is live at khmerdevelopercommunity.github.io/khmerversiondigitalclock/
