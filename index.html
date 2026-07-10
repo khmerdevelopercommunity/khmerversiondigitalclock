@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>នាឡិកាឌីជីថលខ្មែរ</title>
+    <style>
+        /* Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kantumruy Pro', 'Khmer OS Battambang', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #0f111a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+        }
+
+        /* The Clock Dashboard Container */
+        .clock-container {
+            background-color: #1a1d29;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(255, 174, 0, 0.1);
+            border: 2px solid #383121;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 540px;
+            text-align: center;
+        }
+
+        /* Individual cells in the clock table */
+        .clock-cell {
+            background-color: #090a0f;
+            padding: 18px 8px;
+            border-radius: 8px;
+            border: 1px solid #332b1a;
+        }
+
+        /* Labels for the columns */
+        .cell-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #d1b477;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Large glowing Khmer numbers/text */
+        .cell-value {
+            font-size: 44px;
+            font-weight: bold;
+            color: #ffb700; 
+            text-shadow: 0 0 15px rgba(255, 183, 0, 0.6);
+            line-height: 1.2;
+        }
+
+        /* Style specifically for the period text adjustment */
+        #ampm {
+            font-size: 36px;
+        }
+
+        /* Wide cell for the date and day */
+        .date-cell {
+            grid-column: span 4;
+            padding: 15px;
+            font-size: 18px;
+            color: #bdc5e1;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .day-highlight {
+            color: #ffb700;
+            font-weight: bold;
+            background: rgba(255, 183, 0, 0.1);
+            padding: 2px 12px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div class="clock-cell">
+            <span class="cell-label">ម៉ោង</span>
+            <div id="hours" class="cell-value">០០</div>
+        </div>
+        <div class="clock-cell">
+            <span class="cell-label">នាទី</span>
+            <div id="minutes" class="cell-value">០០</div>
+        </div>
+        <div class="clock-cell">
+            <span class="cell-label">វិនាទី</span>
+            <div id="seconds" class="cell-value">០០</div>
+        </div>
+        <div class="clock-cell">
+            <span class="cell-label">វេលា</span>
+            <div id="ampm" class="cell-value">--</div>
+        </div>
+
+        <div class="clock-cell date-cell">
+            <span id="day-display" class="day-highlight">ថ្ងៃ...</span>
+            <span id="date-display">ថ្ងៃ-ខែ-ឆ្នាំ</span>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to convert Western numbers to Khmer digits
+        function toKhmerNumber(numString) {
+            const khmerNumerals = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+            return numString.toString().replace(/[0-9]/g, (w) => khmerNumerals[+w]);
+        }
+
+        // Array to map JavaScript day numbers (0-6) to Khmer names
+        const khmerDays = [
+            "ថ្ងៃអាទិត្យ", 
+            "ថ្ងៃចន្ទ",    
+            "ថ្ងៃអង្គារ",   
+            "ថ្ងៃពុធ",    
+            "ថ្ងៃព្រហស្បតិ៍", 
+            "ថ្ងៃសុក្រ",   
+            "ថ្ងៃសៅរ៍"    
+        ];
+
+        function updateClock() {
+            const d = new Date();
+            
+            // 1. Get raw values for local time elements
+            let hours24 = d.getHours();
+            let minutes = d.getMinutes().toString().padStart(2, '0');
+            let seconds = d.getSeconds().toString().padStart(2, '0');
+            let dayIndex = d.getDay();
+            
+            // Re-arranged date variables to build DD-MM-YYYY format
+            let year = d.getFullYear();
+            let month = (d.getMonth() + 1).toString().padStart(2, '0');
+            let dayOfMonth = d.getDate().toString().padStart(2, '0');
+            
+            // Swapped order here to create Day-Month-Year string layout
+            let dateString = `${dayOfMonth}-${month}-${year}`;
+
+            // 2. Custom logic for traditional Khmer time periods
+            let periodText = "";
+            if (hours24 >= 0 && hours24 < 12) {
+                periodText = "ព្រឹក";  
+            } else if (hours24 >= 12 && hours24 < 16) {
+                periodText = "ថ្ងៃ";   
+            } else if (hours24 >= 16 && hours24 < 19) {
+                periodText = "ល្ងាច"; 
+            } else {
+                periodText = "យប់";   
+            }
+
+            // 3. Convert to 12-hour format display
+            let hours12 = hours24 % 12;
+            hours12 = hours12 ? hours12 : 12; 
+            hours12 = hours12.toString().padStart(2, '0');
+
+            // 4. Inject into the elements with Khmer Number conversions
+            document.getElementById("hours").innerHTML = toKhmerNumber(hours12);
+            document.getElementById("minutes").innerHTML = toKhmerNumber(minutes);
+            document.getElementById("seconds").innerHTML = toKhmerNumber(seconds);
+            document.getElementById("ampm").innerHTML = periodText;
+            
+            document.getElementById("day-display").innerHTML = khmerDays[dayIndex];
+            document.getElementById("date-display").innerHTML = toKhmerNumber(dateString);
+        }
+
+        // Run immediately on load and set ticker interval
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+
+</body>
+</html>
